@@ -19,6 +19,7 @@ import os.path as osp
 import logging
 import yaml
 from utils.util import OrderedYaml
+from datetime import datetime
 
 Loader, Dumper = OrderedYaml()
 
@@ -59,8 +60,13 @@ def parse(opt_path, is_train=True):
         if path and key in opt['path'] and key != 'strict_load':
             opt['path'][key] = osp.expanduser(path)
     opt['path']['root'] = osp.abspath(osp.join(__file__, osp.pardir, osp.pardir, osp.pardir))
-    if is_train:
-        experiments_root = osp.join(opt['path']['root'], 'experiments', opt['name'])
+    if is_train: 
+        now = datetime.now()
+        now = now.strftime("%Y_%m_%d_%H_%M_%S")
+        train_mode = opt['datasets']['train']['mode'].replace('_', '')
+        train_name = opt['datasets']['train']['name'].replace('_', '')
+        mark = opt['model'] + '_' + train_name + '_' + train_mode + '_GT' + str(opt['datasets']['train']['GT_size'])
+        experiments_root = osp.join(opt['path']['root'], 'experiments', now + '_' + mark)
         opt['path']['experiments_root'] = experiments_root
         opt['path']['models'] = osp.join(experiments_root, 'models')
         opt['path']['training_state'] = osp.join(experiments_root, 'training_state')
@@ -74,7 +80,12 @@ def parse(opt_path, is_train=True):
             opt['logger']['save_checkpoint_freq'] = 8
     else:  # test
         if not opt['path'].get('results_root', None):
-            results_root = osp.join(opt['path']['root'], 'results', opt['name'])
+            now = datetime.now()
+            now = now.strftime("%Y_%m_%d_%H_%M_%S")
+            train_mode = opt['datasets']['train']['mode'].replace('_', '')
+            train_name = opt['datasets']['train']['name'].replace('_', '')
+            mark = opt['model'] + '_' + train_name + '_' + train_mode + '_GT' + str(opt['datasets']['train']['GT_size'])
+            results_root = osp.join(opt['path']['root'], 'results', now + '_' + mark)
             opt['path']['results_root'] = results_root
         opt['path']['log'] = opt['path']['results_root']
 

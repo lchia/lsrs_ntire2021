@@ -99,8 +99,9 @@ def main():
     lr_paths = fiFindByWildcard(os.path.join(lr_dir, '*.png'))
     hr_paths = fiFindByWildcard(os.path.join(hr_dir, '*.png'))
 
-    this_dir = os.path.dirname(os.path.realpath(__file__))
-    test_dir = os.path.join(this_dir, '..', 'results', conf)
+    # this_dir = os.path.dirname(os.path.realpath(__file__))
+    # test_dir = os.path.join(this_dir, '..', 'results', conf)
+    test_dir = opt['path']['results_root'] + '_' + conf
     if not os.path.exists(test_dir):
         os.makedirs(test_dir)
     print(f"Out dir: {test_dir}")

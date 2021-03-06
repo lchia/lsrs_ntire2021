@@ -1,8 +1,7 @@
 # LSRS-NTIRE2021 
 This is initially copy from [SRFlow](https://github.com/andreas128/SRFlow)
 
-<br>
-This is also for [NTIRE21LSRS](https://github.com/andreas128/NTIRE21_Learning_SR_Space)
+LINK: [NTIRE21](https://github.com/andreas128/NTIRE21_Learning_SR_Space)
 
 ## Evaluation Protocol
 A method is evaluated by first predicting a set of 10 randomly sampled SR images for each low-resolution image in the dataset. From this set of images, evaluation metrics corresponding to the three criteria above will be considered. The participating methods will be ranked according to each metric. These ranks will then be combined into a final score. The three evaluation metrics are described next.

@@ -90,9 +90,9 @@ class RRDBNet(nn.Module):
         print('\n\t {}: {}, {}'.format(name, x.shape, x[0, 0, :, :]))
 
     def forward(self, x, get_steps=False):
-        self.print_meta(x, 'x')
+        #self.print_meta(x, 'x')
         fea = self.conv_first(x)
-        self.print_meta(fea, 'fea')
+        #self.print_meta(fea, 'fea')
 
         block_idxs = opt_get(self.opt, ['network_G', 'flow', 'stackRRDB', 'blocks']) or []
         block_results = {}
@@ -112,9 +112,9 @@ class RRDBNet(nn.Module):
 
         fea_up4 = self.upconv2(F.interpolate(fea, scale_factor=2, mode='nearest'))
         fea = self.lrelu(fea_up4)
-        self.print_meta(last_lr_fea, 'last_lr_fea') 
-        self.print_meta(fea_up2, 'fea_up2')
-        self.print_meta(fea_up4, 'fea_up4') 
+        # self.print_meta(last_lr_fea, 'last_lr_fea') 
+        # self.print_meta(fea_up2, 'fea_up2')
+        # self.print_meta(fea_up4, 'fea_up4') 
 
         fea_up8 = None
         fea_up16 = None
@@ -123,18 +123,18 @@ class RRDBNet(nn.Module):
         if self.scale >= 8:
             fea_up8 = self.upconv3(F.interpolate(fea, scale_factor=2, mode='nearest'))
             fea = self.lrelu(fea_up8)
-            self.print_meta(fea_up8, 'fea_up8')
+            # self.print_meta(fea_up8, 'fea_up8')
         if self.scale >= 16:
             fea_up16 = self.upconv4(F.interpolate(fea, scale_factor=2, mode='nearest'))
             fea = self.lrelu(fea_up16) 
-            self.print_meta(fea_up16, 'fea_up16')
+            # self.print_meta(fea_up16, 'fea_up16')
         if self.scale >= 32:
             fea_up32 = self.upconv5(F.interpolate(fea, scale_factor=2, mode='nearest'))
             fea = self.lrelu(fea_up32)
-            self.print_meta(fea_up32, 'fea_up32')
+            # self.print_meta(fea_up32, 'fea_up32')
 
         out = self.conv_last(self.lrelu(self.HRconv(fea)))
-        self.print_meta(out, 'out')
+        # self.print_meta(out, 'out')
 
         results = {'last_lr_fea': last_lr_fea,
                    'fea_up1': last_lr_fea,
@@ -148,11 +148,11 @@ class RRDBNet(nn.Module):
         fea_up0_en = opt_get(self.opt, ['network_G', 'flow', 'fea_up0']) or False
         if fea_up0_en:
             results['fea_up0'] = F.interpolate(last_lr_fea, scale_factor=1/2, mode='bilinear', align_corners=False, recompute_scale_factor=True) 
-            self.print_meta(results['fea_up0'], 'fea_up0')
+            # self.print_meta(results['fea_up0'], 'fea_up0')
         fea_upn1_en = opt_get(self.opt, ['network_G', 'flow', 'fea_up-1']) or False
         if fea_upn1_en:
             results['fea_up-1'] = F.interpolate(last_lr_fea, scale_factor=1/4, mode='bilinear', align_corners=False, recompute_scale_factor=True)
-            self.print_meta(results['fea_up-1'], 'fea_up-1')
+            # self.print_meta(results['fea_up-1'], 'fea_up-1')
 
         if get_steps:
             for k, v in block_results.items():

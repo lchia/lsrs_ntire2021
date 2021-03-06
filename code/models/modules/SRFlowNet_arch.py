@@ -82,15 +82,15 @@ class SRFlowNet(nn.Module):
 
     def normal_flow(self, gt, lr, y_onehot=None, epses=None, lr_enc=None, add_gt_noise=True, step=None):
         if lr_enc is None:
-            print('\n\t->1@lr_enc: ', lr_enc)
+            # print('\n\t->1@lr_enc: ', lr_enc)
             lr_enc = self.rrdbPreprocessing(lr)
-            print('\n\t->2@lr_enc: ', len(lr_enc))
+            # print('\n\t->2@lr_enc: ', len(lr_enc))
 
 
         logdet = torch.zeros_like(gt[:, 0, 0, 0])
         pixels = thops.pixels(gt)
-        print('\t 1@logdet: ', logdet.shape)
-        print('\t pixels: ', pixels)
+        # print('\t 1@logdet: ', logdet.shape)
+        # print('\t pixels: ', pixels)
 
         z = gt
         #print('\t 1@z: ', z.shape, z[0])
@@ -104,13 +104,13 @@ class SRFlowNet(nn.Module):
 
 
         # Encode
-        print('\n\t 2@logdet: ', logdet.shape, logdet)
-        print('\t 2@z: ', z.shape, z[0])
+        # print('\n\t 2@logdet: ', logdet.shape, logdet)
+        # print('\t 2@z: ', z.shape, z[0])
         #print('\n\tlr_enc: ', lr_enc)
         epses, logdet = self.flowUpsamplerNet(rrdbResults=lr_enc, gt=z, logdet=logdet, reverse=False, epses=epses,
                                               y_onehot=y_onehot) 
-        print('\n\t 3@logdet: ', logdet.shape, logdet)
-        print('\n\t epses: ', epses.shape)
+        # print('\n\t 3@logdet: ', logdet.shape, logdet)
+        # print('\n\t epses: ', epses.shape)
 
         objective = logdet.clone()
 
@@ -134,7 +134,7 @@ class SRFlowNet(nn.Module):
 
     def rrdbPreprocessing(self, lr):
         rrdbResults = self.RRDB(lr, get_steps=True)
-        print('\n\t=======================================================>rrdbResults = self.RRDB(lr, get_steps=True) ')
+        # print('\n\t=======================================================>rrdbResults = self.RRDB(lr, get_steps=True) ')
 
         block_idxs = opt_get(self.opt, ['network_G', 'flow', 'stackRRDB', 'blocks']) or []
         if len(block_idxs) > 0:

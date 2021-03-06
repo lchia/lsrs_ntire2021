@@ -151,12 +151,12 @@ class SRFlowModel(BaseModel):
         weight_fl = opt_get(self.opt, ['train', 'weight_fl'])
         weight_fl = 1 if weight_fl is None else weight_fl
         if weight_fl > 0:
-            print('self.var_L: ', self.var_L, self.var_L.shape)
-            print('self.real_H: ', self.real_H, self.real_H.shape)
+            #print('self.var_L: ', self.var_L, self.var_L.shape)
+            #print('self.real_H: ', self.real_H, self.real_H.shape)
             z, nll, y_logits = self.netG(gt=self.real_H, lr=self.var_L, reverse=False)
             nll_loss = torch.mean(nll)
             losses['nll_loss'] = nll_loss * weight_fl
-            print('nll_loss: ', nll_loss)
+            #print('nll_loss: ', nll_loss)
 
         weight_l1 = opt_get(self.opt, ['train', 'weight_l1']) or 0
         if weight_l1 > 0:
@@ -164,10 +164,10 @@ class SRFlowModel(BaseModel):
             sr, logdet = self.netG(lr=self.var_L, z=z, eps_std=0, reverse=True, reverse_with_grad=True)
             l1_loss = (sr - self.real_H).abs().mean()
             losses['l1_loss'] = l1_loss * weight_l1
-            print('l1_loss: ', l1_loss)
+            #print('l1_loss: ', l1_loss)
 
         total_loss = sum(losses.values())
-        print('total_loss: ', total_loss)
+        #print('total_loss: ', total_loss)
         # total_loss:  tensor(nan, device='cuda:0', grad_fn=<AddBackward0>)
         # ERROR: RuntimeError: svd_cuda: the updating process of SBDSDC did not converge (error: 11)
  

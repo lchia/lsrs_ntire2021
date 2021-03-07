@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES=4,5,6,7 \
+CUDA_VISIBLE_DEVICES=0,1 \
 python train.py \
-    -opt ./confs/SRFlow_DF2K_4X.yml \
+    -opt ./confs/SRFlow_DF2K_4X_patch256.yml \
     --launcher pytorch

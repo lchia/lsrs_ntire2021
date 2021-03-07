@@ -14,6 +14,6 @@
 # DF2K
 python prepare_data.py \
 	../../../data/DF2K/ \
-	512 \
+	128 \
 	../../../data/DF2K_pkls/ \
 	DF2K \

@@ -22,6 +22,7 @@ import imageio
 
 from natsort import natsort
 from tqdm import tqdm
+import pickle
 
 def get_img_paths(dir_path, wildcard='*.png'):
     return natsort.natsorted(glob.glob(dir_path + '/' + wildcard))
@@ -41,7 +42,7 @@ def to_pklv4(obj, path, vebose=False):
         print("Wrote {}".format(path))
 
 
-from imresize import imresize
+from NTIRE21_Learning_SR_Space import imresize
 
 def random_crop(img, size):
     h, w, c = img.shape
@@ -64,41 +65,65 @@ def imread(img_path):
 
 def to_pklv4_1pct(obj, path, vebose):
     n = int(round(len(obj) * 0.01))
-    path = path.replace(".", "_1pct.")
+    print('\t>>n: ', n)
+    print('\t>>path: ', path)
+
+    path = path.replace(".pklv4", "_1pct.pklv4")
+    print('\t>>@path: ', path)
     to_pklv4(obj[:n], path, vebose=True)
 
+def dump_save(hrs, lqsX4, lqsX8, save_dir, save_tag): 
+    shuffle_combined_3(hrs, lqsX4, lqsX8)
+    print('hrs: ', np.shape(hrs))
+    print('lqsX4: ', np.shape(lqsX4))
+    print('lqsX8: ', np.shape(lqsX8))
 
-def main(dir_path):
+    # HR
+    hrs_path = get_path_withtag(save_dir, save_tag)
+    print('hrs_path: ', hrs_path)
+    to_pklv4(hrs, hrs_path, vebose=True)
+    to_pklv4_1pct(hrs, hrs_path, vebose=True)
+
+    # LR_X4
+    lqsX4_path = get_path_withtag(save_dir, save_tag+'_X4')
+    print('lqs_path: ', lqsX4_path)
+    to_pklv4(lqsX4, lqsX4_path, vebose=True)
+    to_pklv4_1pct(lqsX4, lqsX4_path, vebose=True)
+
+    # LR_X8
+    lqsX8_path = get_path_withtag(save_dir, save_tag+'_X8')
+    print('lqs_path: ', lqsX8_path)
+    to_pklv4(lqsX8, lqsX8_path, vebose=True)
+    to_pklv4_1pct(lqsX8, lqsX8_path, vebose=True)
+
+def main(dir_path, patch_size, save_dir, save_tag):
     hrs = []
-    lqs = []
-
+    lqsX4 = []
+    lqsX8 = []
+    #patch_size = 512
+    save_tag = '%s_patch%d'%(save_tag, patch_size)
+  
     img_paths = get_img_paths(dir_path)
-    print('img_paths: ', len(img_paths), img_paths)
+    print('img_paths: ', len(img_paths))
     for img_path in tqdm(img_paths):
-        img = imread(img_path)
-        print('img: ', img.shape)
+        img = imread(img_path) 
 
-        for i in range(47):
+        for i in range(16):
             crop = random_crop(img, 512)
             cropX4 = imresize(crop, scalar_scale=0.25)
+            cropX8 = imresize(crop, scalar_scale=0.125)
             hrs.append(crop)
-            lqs.append(cropX4)
+            lqsX4.append(cropX4)
+            lqsX8.append(cropX8)
 
-    shuffle_combined(hrs, lqs)
-
-    hrs_path = get_hrs_path(dir_path)
-    #to_pklv4(hrs, hrs_path, vebose=True)
-    #to_pklv4_1pct(hrs, hrs_path, vebose=True)
-
-    lqs_path = get_lqs_path(dir_path)
-    #to_pklv4(lqs, lqs_path, vebose=True)
-    #to_pklv4_1pct(lqs, lqs_path, vebose=True)
+    # save HR, LR_X4, LR_X8
+    dump_save(hrs, lqsX4, lqsX8, save_dir, save_tag)
 
 
 def get_hrs_path(dir_path):
     base_dir = os.path.dirname(dir_path)
     name = os.path.basename(dir_path)
-    hrs_path = os.path.join(base_dir, 'pkls', name + '.pklv4')
+    hrs_path = os.path.join(base_dir, 'pkls', tag + '%s.pklv4')
     return hrs_path
 
 
@@ -108,14 +133,26 @@ def get_lqs_path(dir_path):
     hrs_path = os.path.join(base_dir, 'pkls', name + '_X4.pklv4')
     return hrs_path
 
+def get_path_withtag(save_dir, save_tag): 
+    path = os.path.join(save_dir, '%s.pklv4'%save_tag)
+    return path
+
 
 def shuffle_combined(hrs, lqs):
     combined = list(zip(hrs, lqs))
     random.shuffle(combined)
     hrs[:], lqs[:] = zip(*combined)
 
+def shuffle_combined_3(hrs, lqsX4, lqsX8):
+    combined = list(zip(hrs, lqsX4, lqsX8))
+    random.shuffle(combined)
+    hrs[:], lqsX4[:], lqsX8[:] = zip(*combined)
+
 
 if __name__ == "__main__":
     dir_path = sys.argv[1]
+    patch_size = int(sys.argv[2])
+    save_dir = sys.argv[3]
+    save_tag = sys.argv[4]
     assert os.path.isdir(dir_path)
-    main(dir_path)
+    main(dir_path, patch_size, save_dir, save_tag)
